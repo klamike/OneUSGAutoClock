@@ -19,7 +19,7 @@ from selenium.webdriver.support.expected_conditions import (
 from rich.logging import RichHandler
 from rich.progress import Progress, BarColumn, TextColumn, SpinnerColumn, TimeElapsedColumn
 
-from config import DEFAULT_HOURS_TO_CLOCK, USERNAME, PASSWORD, CHROMEDRIVER_PATH, FAIL_PING_URL, RESEARCH_LOGIN_URL, TA_LOGIN_URL
+from config import DEFAULT_HOURS_TO_CLOCK, USERNAME, PASSWORD, CHROMEDRIVER_PATH, FAIL_PING_URL, LOGIN_URL
 
 progress_columns = [SpinnerColumn(), TextColumn("[progress.description]{task.description}"), BarColumn(bar_width=None), TimeElapsedColumn()]
 
@@ -31,17 +31,10 @@ def ping(text="", data=None, url=FAIL_PING_URL):
         warn(f"{text} ping failed: %s" % e)
 
 class OneUSGAutoClock:
-    job_url_dict = {"research": RESEARCH_LOGIN_URL, "ta": TA_LOGIN_URL}
     wait_time_dict = {'long': 60.0, 'medium': 30.0, 'short': 15.0, 'tiny': 5.0}
     duo_timeout = 120.0
 
-    def __init__(self, job: str = "research", hours_to_clock: float = DEFAULT_HOURS_TO_CLOCK, only_out: bool = False):
-
-        self.job = str(job).lower()
-        if self.job == "0":
-            self.job = "research"
-        if self.job == "1":
-            self.job = "ta"
+    def __init__(self, hours_to_clock: float = DEFAULT_HOURS_TO_CLOCK, only_out: bool = False):
 
         self.hours_to_clock = float(hours_to_clock)
         self.mins_to_clock = self.hours_to_clock * 60.0
@@ -49,7 +42,7 @@ class OneUSGAutoClock:
 
         self.only_out = bool(only_out)
 
-        self.login_url = self.job_url_dict[self.job]
+        self.login_url = LOGIN_URL
 
         self.start_dt = datetime.now()
         self.end_dt = self.start_dt + timedelta(hours=self.hours_to_clock)
@@ -211,7 +204,7 @@ class OneUSGAutoClock:
         # until the clockout time, refresh every 15 mins
         min_counter, elapsed_time = 0.0, 0.0
         with Progress(*progress_columns, expand=True, transient=True) as progress:
-            tid = progress.add_task(f"Clocking for {self.job}", total=self.seconds_to_clock)
+            tid = progress.add_task(f"Clocking", total=self.seconds_to_clock)
 
             while elapsed_time < self.seconds_to_clock:
                 elapsed_time = time.time() - self.clock_in_time
@@ -248,7 +241,7 @@ class OneUSGAutoClock:
 
     def run(self):
         if not self.only_out:
-            info(f"Clocking {self.hours_to_clock}hrs / {self.hours_to_clock*60:.0f}mins (clock in at {self.start_dt}, out at {self.end_dt}) under {self.job}")
+            info(f"Clocking {self.hours_to_clock}hrs / {self.hours_to_clock*60:.0f}mins (clock in at {self.start_dt}, out at {self.end_dt})")
 
         self.login()
         debug("Logged in")
@@ -277,7 +270,6 @@ class OneUSGAutoClock:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="oneusg.py", description="Automated clock in/out for OneUSG hourly employees.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("job", nargs="?", help="research or ta", type=str, default="research", choices=["research", "ta", "0", "1"])
     parser.add_argument("hours", nargs="?", help="hours to clock", type=float, default=DEFAULT_HOURS_TO_CLOCK)
     parser.add_argument("--debug", action="store_true", help="set log level to debug")
     parser.add_argument("--only-out", action="store_true", help="clock out only")
@@ -290,7 +282,7 @@ if __name__ == "__main__":
     )
 
     try:
-        OneUSGAutoClock(args.job, args.hours, only_out=args.only_out).run()
+        OneUSGAutoClock(args.hours, only_out=args.only_out).run()
     except Exception as e:
         ping(f"Uncaught Exception at {datetime.now()}", data=str(e))
         raise e
