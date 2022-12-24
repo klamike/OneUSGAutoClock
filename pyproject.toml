@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "OneUSGAutoClock"
+version = "1.0.0"
+description = "Log your hours in OneUSG without forgetting to clock out. "
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "selenium", "rich"
+]
