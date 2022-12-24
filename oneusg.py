@@ -231,6 +231,7 @@ class OneUSGAutoClock:
 
     def clock_out(self):
         self.go_to_clock_page()
+        self.browser.refresh()
 
         # click the menu button
         self.WDWait(By.ID, "TL_RPTD_SFF_WK_GROUPBOX$PIMG", method="send_keys", keys=Keys.RETURN)
