@@ -210,8 +210,8 @@ class OneUSGAutoClock:
                 elapsed_time = time.time() - self.clock_in_time
                 progress.update(tid, completed=elapsed_time)
 
-                time.sleep(0.6)
-                min_counter += 0.01
+                time.sleep(30)
+                min_counter += 0.5
                 if min_counter % 15 == 0:
                     self.browser.refresh()
                     debug(f"{elapsed_time / 3600:.3f}hrs / {min_counter}mins")
@@ -224,6 +224,7 @@ class OneUSGAutoClock:
 
     def clock_out(self):
         self.go_to_clock_page()
+        self.browser.refresh()
 
         # click the menu button
         self.WDWait(By.ID, "TL_RPTD_SFF_WK_GROUPBOX$PIMG", method="send_keys", keys=Keys.RETURN)

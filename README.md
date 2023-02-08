@@ -6,7 +6,7 @@ Functionally this script is almost the same as [Shaun-Regenbaum/OneUSGAutomaticC
 - This version has [healthchecks.io](https://healthchecks.io) integration for success/failure pinging and [touchbar status](https://github.com/klamike/btt-healthchecks).
 - This version supports multiple jobs (see also the [onejob](https://github.com/klamike/OneUSGAutoClock/tree/onejob) branch)
 
-### USE AT YOUR OWN RISK
+### USE AT YOUR OWN RISK - not tested since Dec 2022
 ___
 
 ## Installation
